@@ -1,0 +1,32 @@
+# Environment
+.env
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/raw/*.csv
+data/processed/*.csv
+data/monitoring/*.csv
+
+# Models
+models/*.pkl
+models/*.joblib
+
+# Reports / generated outputs
+reports/figures/
+reports/*.csv
+
+# OS
+.DS_Store.env
+data/raw/
+data/processed/
+models/
+mlruns/
+__pycache__/
