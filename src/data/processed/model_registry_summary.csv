@@ -1,0 +1,4 @@
+horizon,registered_model,version,alias,selected_model,MAE,RMSE,R2,mlflow_run_id,model_uri,champion_uri
+target_6h,flood_forecast_6h,4,champion,XGBoost Delta target_6h,0.006381725873306377,0.009779853803059974,0.995173432989205,2d96f211bc3c48508f353ccb122a9d1c,runs:/2d96f211bc3c48508f353ccb122a9d1c/model,models:/flood_forecast_6h@champion
+target_24h,flood_forecast_24h,4,champion,XGBoost Delta target_24h,0.018277309107821778,0.027895125381897506,0.9607570212163487,e894683d49b0431abd76a4d80f3daf41,runs:/e894683d49b0431abd76a4d80f3daf41/model,models:/flood_forecast_24h@champion
+target_72h,flood_forecast_72h,4,champion,Ridge Delta target_72h,0.05064518326612943,0.06970174569967733,0.7550420724935024,261e09317e2d4b44bbd12c390a83e8ed,runs:/261e09317e2d4b44bbd12c390a83e8ed/model,models:/flood_forecast_72h@champion

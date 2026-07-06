@@ -30,3 +30,34 @@ data/processed/
 models/
 mlruns/
 __pycache__/
+
+# Environment / secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow local data
+mlruns/
+mlartifacts/
+*.db
+*.db-shm
+*.db-wal
+
+# Generated prediction / monitoring data
+src/data/predictions/*.csv
+src/data/predictions/*.json
+
+# Retraining generated outputs
+src/data/retraining/*.csv
+src/data/retraining/*.json
+
+# macOS
+.DS_Store
