@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from pathlib import Path
 from typing import Any
 
@@ -95,8 +97,108 @@ MLFLOW_DB = (
 )
 
 
-TRACKING_URI = (
-    f"sqlite:///{MLFLOW_DB}"
+import os
+
+import mlflow
+
+
+MLFLOW_TRACKING_URI = os.getenv(
+    "MLFLOW_TRACKING_URI",
+    "http://127.0.0.1:5000",
+)
+
+
+MLFLOW_EXPERIMENT_NAME = (
+    "flood-forecasting-portable"
+)
+
+
+mlflow.set_tracking_uri(
+    MLFLOW_TRACKING_URI
+)
+
+
+mlflow.set_experiment(
+    MLFLOW_EXPERIMENT_NAME
+)
+
+
+print(
+    "MLflow tracking URI:"
+)
+
+print(
+    mlflow.get_tracking_uri()
+)
+
+
+experiment = (
+    mlflow.get_experiment_by_name(
+        MLFLOW_EXPERIMENT_NAME
+    )
+)
+
+
+if experiment is None:
+
+    raise RuntimeError(
+        "Portable MLflow experiment "
+        "was not found."
+    )
+
+
+print()
+
+print(
+    "Experiment:"
+)
+
+print(
+    experiment.name
+)
+
+
+print()
+
+print(
+    "Experiment ID:"
+)
+
+print(
+    experiment.experiment_id
+)
+
+
+print()
+
+print(
+    "Artifact location:"
+)
+
+print(
+    experiment.artifact_location
+)
+
+
+if (
+    str(
+        experiment.artifact_location
+    )
+    .startswith(
+        "file:///Users/"
+    )
+):
+
+    raise RuntimeError(
+        "Experiment still uses a "
+        "machine-specific artifact path."
+    )
+
+
+print()
+
+print(
+    "Portable MLflow configuration PASSED."
 )
 
 PROJECT_ROOT = (
@@ -123,11 +225,22 @@ PREDICTION_LOG_PATH = (
 
 def configure_mlflow() -> MlflowClient:
     """
-    Configure MLflow to use the same SQLite backend
-    used by the training notebook and Model Registry.
+    Configure MLflow for either:
+
+    1. Local development using the SQLite backend.
+    2. Docker/remote serving using MLFLOW_TRACKING_URI.
     """
 
-    if not MLFLOW_DB.exists():
+    uses_local_sqlite = (
+        MLFLOW_TRACKING_URI.startswith(
+            "sqlite:///"
+        )
+    )
+
+    if (
+        uses_local_sqlite
+        and not MLFLOW_DB.exists()
+    ):
 
         raise FileNotFoundError(
             "MLflow database was not found.\n\n"
@@ -138,7 +251,7 @@ def configure_mlflow() -> MlflowClient:
         )
 
     mlflow.set_tracking_uri(
-        TRACKING_URI
+        MLFLOW_TRACKING_URI
     )
 
     client = MlflowClient()
@@ -153,21 +266,32 @@ def configure_mlflow() -> MlflowClient:
 
     print()
 
-    print(
-        "MLflow DB exists:",
-        MLFLOW_DB.exists(),
-    )
+    if uses_local_sqlite:
 
-    print(
-        "MLflow DB path   :",
-        MLFLOW_DB.resolve(),
-    )
+        print(
+            "MLflow DB exists:",
+            MLFLOW_DB.exists(),
+        )
 
-    print(
-        "MLflow DB size   :",
-        MLFLOW_DB.stat().st_size,
-        "bytes",
-    )
+        if MLFLOW_DB.exists():
+
+            print(
+                "MLflow DB path   :",
+                MLFLOW_DB.resolve(),
+            )
+
+            print(
+                "MLflow DB size   :",
+                MLFLOW_DB.stat().st_size,
+                "bytes",
+            )
+
+    else:
+
+        print(
+            "Using remote MLflow "
+            "Tracking Server."
+        )
 
     return client
 
