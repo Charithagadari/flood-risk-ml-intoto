@@ -1,0 +1,86 @@
+services:
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: flood-risk-mlflow
+
+    command:
+      - mlflow
+      - server
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+      - --backend-store-uri
+      - sqlite:////mlflow-data/mlflow.db
+      - --artifacts-destination
+      - /mlartifacts
+      - --serve-artifacts
+
+    ports:
+      - "5001:5000"
+
+    volumes:
+      - "${HOME}/.mlflow/flood-risk:/mlflow-data"
+
+      - "./mlartifacts:/mlartifacts"
+
+      # TEMPORARY:
+      # Current champion v2 artifacts still use the old
+      # Mac/iCloud file URI.
+      - "./mlruns:/Users/charithagadari/Library/Mobile Documents/com~apple~CloudDocs/flood-risk-ml-intoto/mlruns:ro"
+
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:5000/health
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+
+    restart: unless-stopped
+
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: flood-risk-api
+
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      PREDICTION_TIMEOUT_SECONDS: "300"
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - "./src/data/predictions:/app/src/data/predictions"
+
+      # TEMPORARY:
+      # Needed for current champion v2 artifacts.
+      - "./mlruns:/Users/charithagadari/Library/Mobile Documents/com~apple~CloudDocs/flood-risk-ml-intoto/mlruns:ro"
+
+    depends_on:
+      mlflow:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:8000/health
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+
+    restart: unless-stopped
