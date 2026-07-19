@@ -412,6 +412,8 @@ flood-risk-ml-intoto/
 |   `-- main.py
 |
 |-- notebooks/
+|   |-- 01_eda_reservoir_updated.ipynb
+|   |-- forecasting_model.ipynb
 |   |-- mlflow_configuration_v2.ipynb
 |   `-- forecasting_model_mlflow_registry.ipynb
 |
